@@ -1,10 +1,7 @@
 package com.shaiicodez.minipaint
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -14,12 +11,16 @@ import androidx.core.content.res.ResourcesCompat
 // A constant for the stroke width
 private const val STROKE_WIDTH = 12f // has to be float
 
-class MyCanvasView (context : Context) : View(context){
-
+class MyCanvasView(context: Context) : View(context) {
 
     // These are your bitmap and canvas for caching what has been drawn before.
-    private lateinit var extraCanvas: Canvas
-    private lateinit var extraBitmap: Bitmap
+    //private lateinit var extraCanvas: Canvas
+    //private lateinit var extraBitmap: Bitmap
+    // Path representing the drawing so far
+    private val drawing = Path()
+
+    // Path representing what's currently being drawn
+    private val curPath = Path()
 
     // A class level variable backgroundColor, for the background color of the canvas
     private val backgroundColor = ResourcesCompat.getColor(resources, R.color.colorBackground, null)
@@ -54,6 +55,8 @@ class MyCanvasView (context : Context) : View(context){
 
     private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
 
+    private lateinit var frame: Rect
+
     /**
      * This callback method is called by the Android system with the changed screen dimensions,
      * that is, with a new width and height (to change to)
@@ -69,16 +72,27 @@ class MyCanvasView (context : Context) : View(context){
          *  To fix this, recycle extraBitmap before creating the next one.
          **/
 
-        if (::extraBitmap.isInitialized) extraBitmap.recycle()
+        //if (::extraBitmap.isInitialized) extraBitmap.recycle()
         // An instance of Bitmap with the new width and height
-        extraBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        extraCanvas = Canvas(extraBitmap)
-        extraCanvas.drawColor(backgroundColor)
+        //extraBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        //extraCanvas = Canvas(extraBitmap)
+        //extraCanvas.drawColor(backgroundColor)
+
+        // Calculate a rectangular frame around the picture.
+        val inset = 40
+        frame = Rect(inset, inset, width - inset, height - inset)
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        canvas.drawBitmap(extraBitmap, 0f, 0f, null)
+        //canvas.drawBitmap(extraBitmap, 0f, 0f, null)
+
+        // Draw the drawing so far
+        canvas.drawPath(drawing, paint)
+        // Draw any current squiggle
+        canvas.drawPath(curPath, paint)
+        // Draw a frame around the canvas
+        canvas.drawRect(frame, paint)
     }
 
     //touch event methods
@@ -106,14 +120,18 @@ class MyCanvasView (context : Context) : View(context){
             currentX = motionTouchEventX
             currentY = motionTouchEventY
             // Draw the path in the extra bitmap to cache it.
-            extraCanvas.drawPath(path, paint)
+            //extraCanvas.drawPath(path, paint)
         }
         invalidate()
     }
 
     private fun touchUp() {
         // Reset the path so it doesn't get drawn again.
-        path.reset()
+        //path.reset()
+        // Add the current path to the drawing so far
+        drawing.addPath(curPath)
+        // Rewind the current path for the next touch
+        curPath.reset()
     }
 
 
