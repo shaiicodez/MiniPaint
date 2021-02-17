@@ -25,19 +25,6 @@ class MyCanvasView(context: Context) : View(context) {
     // A class level variable backgroundColor, for the background color of the canvas
     private val backgroundColor = ResourcesCompat.getColor(resources, R.color.colorBackground, null)
 
-    // Set up the paint with which to draw.
-    private val paint = Paint().apply {
-        color = drawColor
-        // Smooths out edges of what is drawn without affecting shape.
-        isAntiAlias = true
-        // Dithering affects how colors with higher-precision than the device are down-sampled.
-        isDither = true
-        style = Paint.Style.STROKE // default: FILL
-        strokeJoin = Paint.Join.ROUND // default: MITER
-        strokeCap = Paint.Cap.ROUND // default: BUTT
-        strokeWidth = STROKE_WIDTH // default: Hairline-width (really thin)
-    }
-
     // For holding the color to draw with
     private val drawColor = ResourcesCompat.getColor(resources, R.color.colorPaint, null)
 
@@ -56,6 +43,19 @@ class MyCanvasView(context: Context) : View(context) {
     private val touchTolerance = ViewConfiguration.get(context).scaledTouchSlop
 
     private lateinit var frame: Rect
+
+    // Set up the paint with which to draw.
+    private val paint = Paint().apply {
+        color = drawColor
+        // Smooths out edges of what is drawn without affecting shape.
+        isAntiAlias = true
+        // Dithering affects how colors with higher-precision than the device are down-sampled.
+        isDither = true
+        style = Paint.Style.STROKE // default: FILL
+        strokeJoin = Paint.Join.ROUND // default: MITER
+        strokeCap = Paint.Cap.ROUND // default: BUTT
+        strokeWidth = STROKE_WIDTH // default: Hairline-width (really thin)
+    }
 
     /**
      * This callback method is called by the Android system with the changed screen dimensions,
@@ -133,7 +133,6 @@ class MyCanvasView(context: Context) : View(context) {
         // Rewind the current path for the next touch
         curPath.reset()
     }
-
 
     // method to respond to motion on the display
     //  cache the x and y coordinates of the passed in event
